@@ -1,19 +1,20 @@
 from astrbot.api.event import filter, AstrMessageEvent
-from astrbot.api.star import Context, Star, register
+from astrbot.api.star import Context, Star
 from astrbot.api import logger, AstrBotConfig
 import aiohttp
 
 
-@register(
-    "astrbot_plugin_memos_pusher",
-    "penguinway",
-    "快速将灵感推送到 Memos",
-    "1.0.0",
-)
 class MemosPlugin(Star):
     def __init__(self, context: Context, config: AstrBotConfig):
         super().__init__(context)
         self.config = config
+        self._session: aiohttp.ClientSession | None = None
+
+    def _get_session(self) -> aiohttp.ClientSession:
+        """获取或创建 HTTP Session（延迟初始化）"""
+        if self._session is None or self._session.closed:
+            self._session = aiohttp.ClientSession()
+        return self._session
 
     def _get_url(self) -> str:
         url = self.config.get("memos_url", "").strip().rstrip("/")
@@ -51,25 +52,23 @@ class MemosPlugin(Star):
         }
 
         try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post(
-                    api_url, json=payload, headers=headers, timeout=aiohttp.ClientTimeout(total=10)
-                ) as resp:
-                    if resp.status == 200:
-                        data = await resp.json()
-                        memo_name = data.get("name", "")
-                        # Extract memo uid for link
-                        memo_uid = data.get("uid", "")
-                        link = f"{url}/m/{memo_uid}" if memo_uid else url
-                        yield event.plain_result(
-                            f"✅ 灵感已记录！\n🔗 {link}"
-                        )
-                    else:
-                        error_text = await resp.text()
-                        logger.error(f"Memos API error: {resp.status} {error_text}")
-                        yield event.plain_result(
-                            f"❌ 推送失败 (HTTP {resp.status})"
-                        )
+            session = self._get_session()
+            async with session.post(
+                api_url, json=payload, headers=headers, timeout=aiohttp.ClientTimeout(total=10)
+            ) as resp:
+                if resp.status == 200:
+                    data = await resp.json()
+                    memo_uid = data.get("uid", "")
+                    link = f"{url}/m/{memo_uid}" if memo_uid else url
+                    yield event.plain_result(
+                        f"✅ 灵感已记录！\n🔗 {link}"
+                    )
+                else:
+                    error_text = await resp.text()
+                    logger.error(f"Memos API error: {resp.status} {error_text}")
+                    yield event.plain_result(
+                        f"❌ 推送失败 (HTTP {resp.status})"
+                    )
         except aiohttp.ClientError as e:
             logger.error(f"Memos connection error: {e}")
             yield event.plain_result(f"❌ 连接 Memos 失败，请检查地址配置")
@@ -78,4 +77,7 @@ class MemosPlugin(Star):
             yield event.plain_result(f"❌ 发生错误: {e}")
 
     async def terminate(self):
-        pass
+        """插件终止时关闭 HTTP Session"""
+        if self._session and not self._session.closed:
+            await self._session.close()
+            logger.info("Memos plugin HTTP session closed")
