@@ -1,0 +1,21 @@
+{
+    "memos_url": {
+        "description": "Memos 服务地址",
+        "type": "string",
+        "hint": "例如 https://memos.example.com",
+        "default": ""
+    },
+    "memos_token": {
+        "description": "Memos Access Token",
+        "type": "string",
+        "hint": "在 Memos 设置 -> Access Tokens 中生成",
+        "default": ""
+    },
+    "default_visibility": {
+        "description": "默认可见性",
+        "type": "string",
+        "options": ["PRIVATE", "PROTECTED", "PUBLIC"],
+        "default": "PRIVATE",
+        "hint": "PRIVATE=仅自己可见, PROTECTED=登录用户可见, PUBLIC=所有人可见"
+    }
+}
