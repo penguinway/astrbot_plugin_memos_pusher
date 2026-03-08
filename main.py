@@ -3,7 +3,7 @@ from astrbot.api.star import Context, Star
 from astrbot.api import logger, AstrBotConfig
 import aiohttp
 
-from memos_client import MemosClient, MemosAPIError
+from .memos_client import MemosClient, MemosAPIError
 
 _VISIBILITY_OPTIONS = ("PRIVATE", "PROTECTED", "PUBLIC")
 
