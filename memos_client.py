@@ -91,7 +91,8 @@ class MemosClient:
         name = self._memo_name(uid)
         return await self._request(
             "PATCH", f"/{name}",
-            json={"content": content, "updateMask": "content"},
+            params={"updateMask": "content"},
+            json={"content": content},
         )
 
     async def update_visibility(self, uid: str, visibility: str) -> dict:
@@ -99,7 +100,8 @@ class MemosClient:
         name = self._memo_name(uid)
         return await self._request(
             "PATCH", f"/{name}",
-            json={"visibility": visibility, "updateMask": "visibility"},
+            params={"updateMask": "visibility"},
+            json={"visibility": visibility},
         )
 
     async def delete(self, uid: str) -> None:
