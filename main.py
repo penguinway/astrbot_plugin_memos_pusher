@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from astrbot.api.event import filter, AstrMessageEvent
 from astrbot.api.star import Context, Star
 from astrbot.api import logger, AstrBotConfig

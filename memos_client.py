@@ -5,6 +5,8 @@ Memos API v1 客户端封装
     memo = await client.create("内容", "PRIVATE")
     memos = await client.list(page=1, page_size=5)
 """
+from __future__ import annotations
+
 import aiohttp
 
 
