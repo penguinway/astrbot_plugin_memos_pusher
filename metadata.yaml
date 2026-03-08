@@ -1,7 +1,7 @@
 name: astrbot_plugin_memos_pusher
 display_name: Memos 灵感推送
-desc: 快速将灵感推送到 Memos，支持 /memo 指令。
-version: v1.0.0
+desc: Memos 完整管理插件，支持创建、列表、查看、删除、搜索、编辑笔记。
+version: v2.0.0
 author: penguinway
 repo: "https://github.com/penguinway/astrbot_plugin_memos_pusher"
 license: MIT
